@@ -22,7 +22,6 @@ let currentHits = 0;
 let searchQuery = '';
 
 form.addEventListener('submit', onFormSubmit);
-
 async function onFormSubmit(event) {
   event.preventDefault();
 
@@ -61,17 +60,19 @@ async function onFormSubmit(event) {
     console.log(error);
   }
 }
-
+let totalPages = Math.ceil(totalHits / 40);
 loadMore.addEventListener('click', onLoadMore);
 
 async function onLoadMore() {
+  loadMore.classList.add('hidden');
   currentPage += 1;
-  const response = await API.fetchPhotos(searchQuery, currentPage);
-  render.photoMarkup(response.hits);
-  lightbox.refresh();
-  currentHits += response.hits.length;
-
-  if (currentHits === response.totalHits) {
+  if (currentPage < totalPages) {
+    loadMore.classList.remove('hidden');
+    const response = await API.fetchPhotos(searchQuery, currentPage);
+    render.photoMarkup(response.hits);
+    lightbox.refresh();
+    currentHits += response.hits.length;
+  } else {
     loadMore.classList.add('hidden');
     Notiflix.Notify.info(
       "We're sorry, but you've reached the end of search results."
