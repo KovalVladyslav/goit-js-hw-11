@@ -60,18 +60,18 @@ async function onFormSubmit(event) {
     console.log(error);
   }
 }
-let totalPages = Math.ceil(totalHits / 40);
+
 loadMore.addEventListener('click', onLoadMore);
 
 async function onLoadMore() {
-  loadMore.classList.add('hidden');
   currentPage += 1;
+  const response = await API.fetchPhotos(searchQuery, currentPage);
+  let totalPages = Math.ceil(response.totalHits / 40);
+  render.photoMarkup(response.hits);
+  lightbox.refresh();
+  currentHits += response.hits.length;
   if (currentPage < totalPages) {
-    loadMore.classList.remove('hidden');
-    const response = await API.fetchPhotos(searchQuery, currentPage);
-    render.photoMarkup(response.hits);
-    lightbox.refresh();
-    currentHits += response.hits.length;
+    loadMore.classList.add('hidden');
   } else {
     loadMore.classList.add('hidden');
     Notiflix.Notify.info(
