@@ -20,6 +20,7 @@ let lightbox = new SimpleLightbox('.photo-card a', {
 let currentPage = 1;
 let currentHits = 0;
 let searchQuery = '';
+let totalPages = 0;
 
 form.addEventListener('submit', onFormSubmit);
 async function onFormSubmit(event) {
@@ -35,7 +36,7 @@ async function onFormSubmit(event) {
   const response = await API.fetchPhotos(searchQuery, currentPage);
   currentHits = response.hits.length;
 
-  if (response.totalHits >= currentHits) {
+  if (response.totalHits > currentHits) {
     loadMore.classList.remove('hidden');
   } else {
     loadMore.classList.add('hidden');
@@ -66,12 +67,13 @@ loadMore.addEventListener('click', onLoadMore);
 async function onLoadMore() {
   currentPage += 1;
   const response = await API.fetchPhotos(searchQuery, currentPage);
-  let totalPages = Math.ceil(response.totalHits / 40);
+  totalPages = Math.ceil(response.totalHits / 40);
   render.photoMarkup(response.hits);
   lightbox.refresh();
   currentHits += response.hits.length;
+
   if (currentPage < totalPages) {
-    loadMore.classList.add('hidden');
+    loadMore.classList.remove('hidden');
   } else {
     loadMore.classList.add('hidden');
     Notiflix.Notify.info(
